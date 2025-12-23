@@ -1,0 +1,240 @@
+# Example Lovelace configuration for Color Picker Card
+# Copy and paste these examples into your dashboard YAML
+
+# First, add the resource to your Lovelace resources
+resources:
+  - url: /local/color-picker-card.js
+    type: module
+
+# Example 1: Minimal configuration
+# Create an input_text helper first:
+input_text:
+  my_color:
+    name: My Color
+    initial: "FF0000"
+    max: 7
+
+# Then add this card to your dashboard:
+views:
+  - title: Color Picker Examples
+    cards:
+      # Minimal example
+      - type: custom:color-picker-card
+        entity: input_text.my_color
+
+      # Full configuration example
+      - type: custom:color-picker-card
+        entity: input_text.led_strip_color
+        name: LED Strip Color
+        icon: mdi:led-strip-variant
+        show_header: true
+
+      # Multiple color pickers in a grid
+      - type: grid
+        columns: 2
+        cards:
+          - type: custom:color-picker-card
+            entity: input_text.room1_color
+            name: Living Room
+            icon: mdi:sofa
+
+          - type: custom:color-picker-card
+            entity: input_text.room2_color
+            name: Bedroom
+            icon: mdi:bed
+
+          - type: custom:color-picker-card
+            entity: input_text.room3_color
+            name: Kitchen
+            icon: mdi:stove
+
+          - type: custom:color-picker-card
+            entity: input_text.room4_color
+            name: Bathroom
+            icon: mdi:shower
+
+# Example 2: RGB LED Strip with automation
+# configuration.yaml
+input_text:
+  rgb_strip_color:
+    name: RGB LED Strip Color
+    initial: "FF0000"
+    max: 7
+
+# automations.yaml
+automation:
+  - id: update_led_strip_color
+    alias: "Update RGB LED Strip Color"
+    trigger:
+      - platform: state
+        entity_id: input_text.rgb_strip_color
+    action:
+      - service: light.turn_on
+        target:
+          entity_id: light.led_strip
+        data:
+          rgb_color: >
+            {% set hex = states('input_text.rgb_strip_color').lstrip('#') %}
+            {{ [
+              hex[0:2]|int(base=16),
+              hex[2:4]|int(base=16),
+              hex[4:6]|int(base=16)
+            ] }}
+
+# Example 3: Night light with very dim colors
+input_text:
+  night_light_color:
+    name: Night Light Color
+    initial: "0F0000"  # Very dim red
+    max: 7
+
+automation:
+  - id: update_night_light
+    alias: "Update Night Light Color"
+    trigger:
+      - platform: state
+        entity_id: input_text.night_light_color
+    action:
+      - service: light.turn_on
+        target:
+          entity_id: light.night_light
+        data:
+          rgb_color: >
+            {% set hex = states('input_text.night_light_color').lstrip('#') %}
+            {{ [
+              hex[0:2]|int(base=16),
+              hex[2:4]|int(base=16),
+              hex[4:6]|int(base=16)
+            ] }}
+
+# Example 4: Multiple zones with horizontal stack
+- type: horizontal-stack
+  cards:
+    - type: custom:color-picker-card
+      entity: input_text.zone1_color
+      name: Zone 1
+      icon: mdi:numeric-1-circle
+
+    - type: custom:color-picker-card
+      entity: input_text.zone2_color
+      name: Zone 2
+      icon: mdi:numeric-2-circle
+
+    - type: custom:color-picker-card
+      entity: input_text.zone3_color
+      name: Zone 3
+      icon: mdi:numeric-3-circle
+
+# Example 5: Conditional card (only show when light is on)
+- type: conditional
+  conditions:
+    - entity: light.led_strip
+      state: "on"
+  card:
+    type: custom:color-picker-card
+    entity: input_text.led_strip_color
+    name: LED Color (Light is ON)
+    icon: mdi:led-on
+
+# Example 6: Inside an entities card
+- type: entities
+  title: LED Controls
+  entities:
+    - entity: light.led_strip
+    - type: custom:color-picker-card
+      entity: input_text.led_strip_color
+    - entity: input_number.led_brightness
+
+# Example 7: With header hidden (compact mode)
+- type: custom:color-picker-card
+  entity: input_text.compact_color
+  show_header: false
+
+# Example 8: Theme color selectors
+input_text:
+  theme_primary:
+    name: Theme Primary Color
+    initial: "3B82F6"
+    max: 7
+
+  theme_secondary:
+    name: Theme Secondary Color
+    initial: "8B5CF6"
+    max: 7
+
+  theme_accent:
+    name: Theme Accent Color
+    initial: "F59E0B"
+    max: 7
+
+- type: vertical-stack
+  cards:
+    - type: custom:color-picker-card
+      entity: input_text.theme_primary
+      name: Primary Color
+      icon: mdi:palette
+
+    - type: custom:color-picker-card
+      entity: input_text.theme_secondary
+      name: Secondary Color
+      icon: mdi:palette
+
+    - type: custom:color-picker-card
+      entity: input_text.theme_accent
+      name: Accent Color
+      icon: mdi:palette
+
+# Example 9: Integration with template light
+light:
+  - platform: template
+    lights:
+      custom_rgb_light:
+        friendly_name: "Custom RGB Light"
+        turn_on:
+          service: script.turn_on_rgb_light
+        turn_off:
+          service: script.turn_off_rgb_light
+        set_rgb:
+          service: script.set_rgb_light_color
+          data:
+            rgb_color: "{{ rgb }}"
+
+script:
+  set_rgb_light_color:
+    sequence:
+      - service: input_text.set_value
+        target:
+          entity_id: input_text.custom_light_color
+        data:
+          value: >
+            {{ '%02x%02x%02x' | format(rgb[0], rgb[1], rgb[2]) | upper }}
+
+# Example 10: ESPHome RGB LED
+# Home Assistant configuration
+input_text:
+  esphome_led_color:
+    name: ESPHome LED Color
+    initial: "FF0000"
+    max: 7
+
+automation:
+  - id: update_esphome_led
+    alias: "Update ESPHome LED Color"
+    trigger:
+      - platform: state
+        entity_id: input_text.esphome_led_color
+    action:
+      - service: esphome.living_room_led_set_rgb
+        data:
+          red: >
+            {{ states('input_text.esphome_led_color')[0:2]|int(base=16) }}
+          green: >
+            {{ states('input_text.esphome_led_color')[2:4]|int(base=16) }}
+          blue: >
+            {{ states('input_text.esphome_led_color')[4:6]|int(base=16) }}
+
+# Dashboard card
+- type: custom:color-picker-card
+  entity: input_text.esphome_led_color
+  name: Living Room LED
+  icon: mdi:lightbulb
