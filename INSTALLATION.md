@@ -103,6 +103,8 @@ Then restart Home Assistant or reload helpers.
 
 ### Step 2: Add the Card to Your Dashboard
 
+> **Note**: As of version 2.0.0, the card defaults to collapsed mode with a compact layout. This is perfect for dashboards with multiple LEDs. Click the preview or expand button to open the color picker.
+
 **Via UI:**
 
 1. Edit your dashboard (three dots → Edit Dashboard)
@@ -120,7 +122,8 @@ Then restart Home Assistant or reload helpers.
    entity: input_text.led_color
    name: My LED Strip
    icon: mdi:led-strip-variant
-   show_header: true
+   compact: true
+   default_collapsed: false
    ```
 7. Click "Save"
 
@@ -189,12 +192,16 @@ To verify the installation worked:
 1. **Check the browser console**
    - Open Developer Tools (F12)
    - Look for the Color Picker Card version message
-   - Should see: `COLOR-PICKER-CARD Version 1.0.0`
+   - Should see: `COLOR-PICKER-CARD Version 2.0.0`
 
 2. **Test the card**
-   - The color picker wheel and brightness slider should appear
-   - Changing colors should update the preview
-   - The hex value should display below the preview
+   - You should see a compact row with: icon, entity name, color preview, hex input, and expand button
+   - The card should start collapsed by default
+   - Click the expand button (▶) or color preview to expand
+   - Three sliders should appear (hue, saturation, value)
+   - Changing sliders should update the preview and icon color
+   - The hex input field should show the current color
+   - Type a hex code in the input to change the color
    - The entity value should update in real-time
 
 3. **Check for errors**

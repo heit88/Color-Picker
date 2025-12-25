@@ -597,7 +597,7 @@ window.customCards.push({
 });
 
 console.info(
-  '%c COLOR-PICKER-CARD %c Version 1.0.0 ',
+  '%c COLOR-PICKER-CARD %c Version 2.0.0 ',
   'color: white; background: #0066cc; font-weight: bold;',
   'color: #0066cc; background: white; font-weight: bold;'
 );

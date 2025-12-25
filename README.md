@@ -6,9 +6,13 @@ A custom Lovelace card that provides an intuitive color picker with **separate h
 
 ## Features
 
-- 🎨 **HSV-based color picker** - Color wheel shows hue/saturation at full brightness
-- 💡 **Separate brightness slider** - Control brightness independently (0-100%)
+- 🎨 **HSV-based color picker** - Three separate sliders for hue, saturation, and value
+- 💡 **Separate brightness control** - Brightness slider stays visible even at 0% brightness
 - 🔍 **Visual preview** - See the actual color including dim values like `#0F0000`
+- 🎯 **Entity icon display** - Shows the entity's icon colored by the hue (at full brightness)
+- ⌨️ **Direct hex input** - Type hex codes directly to duplicate colors across entities
+- 📦 **Compact mode** - Space-efficient design perfect for controlling multiple LEDs
+- 🔽 **Collapsible picker** - Defaults to collapsed; click to expand when needed
 - 📝 **Hex output** - Writes hex color values to `input_text` or text helper entities
 - 🎯 **Perfect for LEDs** - Easily select very dim colors that are invisible on traditional pickers
 
@@ -77,7 +81,8 @@ type: custom:color-picker-card
 entity: input_text.led_color
 name: LED Strip Color
 icon: mdi:led-strip-variant
-show_header: true
+compact: true
+default_collapsed: false
 ```
 
 ## Configuration Options
@@ -85,11 +90,27 @@ show_header: true
 | Option | Type | Required | Default | Description |
 |--------|------|----------|---------|-------------|
 | `entity` | string | **Yes** | - | The `input_text` or text helper entity to control |
-| `name` | string | No | "Color Picker" | Name displayed in the card header |
-| `icon` | string | No | - | Icon to display in the card header (e.g., `mdi:led-strip`) |
-| `show_header` | boolean | No | `true` | Whether to show the card header |
+| `name` | string | No | Entity's friendly name | Custom name to display (overrides entity's friendly name) |
+| `icon` | string | No | Entity's icon or `mdi:palette` | Icon to display, colored by the hue at full brightness |
+| `compact` | boolean | No | `true` | Use compact layout (smaller padding and sliders) |
+| `default_collapsed` | boolean | No | `true` | Start with the color picker collapsed |
 
 ## Usage Examples
+
+### Single LED Control (Compact & Collapsed)
+
+Perfect for dashboards with multiple LEDs:
+
+```yaml
+type: custom:color-picker-card
+entity: input_text.desk_led_color
+name: Desk LED
+icon: mdi:desk-lamp
+compact: true
+default_collapsed: true
+```
+
+The card will show a compact row with the icon (colored by hue), name, preview, hex input, and expand button. Click to expand the full color picker when needed.
 
 ### RGB LED Strip Control
 
@@ -98,6 +119,7 @@ type: custom:color-picker-card
 entity: input_text.rgb_strip_color
 name: RGB LED Strip
 icon: mdi:led-strip-variant
+compact: true
 ```
 
 Then use the color in your automations:
@@ -186,11 +208,27 @@ text_sensor:
 
 ## How It Works
 
-1. **User selects color** - Choose hue/saturation on the color wheel
-2. **User adjusts brightness** - Use the slider to set brightness (0-100%)
+1. **User selects color** - Use three sliders for hue, saturation, and value
+2. **Direct input option** - Or type hex codes directly in the input field
 3. **Card calculates hex** - Converts HSV to hex format (e.g., `#0F0000`)
 4. **Updates entity** - Calls `input_text.set_value` service
-5. **Automation triggered** - Your automation uses the hex value
+5. **Icon updates** - Entity icon color reflects the hue at full brightness
+6. **Automation triggered** - Your automation uses the hex value
+
+## UI Components
+
+The card displays a compact header row with:
+
+- **Entity Icon**: Colored using the hue at full saturation/brightness (grayscale colors show actual value)
+- **Entity Name**: Displays the entity's friendly name (or custom name from config)
+- **Color Preview**: Shows the actual selected color (including dim values)
+- **Hex Input**: Type or copy hex codes (with or without `#` prefix)
+- **Expand Button**: Click to show/hide the color picker sliders
+
+When expanded, you get three sliders:
+- **Hue** (0-360°): Select the color (red, orange, yellow, green, cyan, blue, magenta)
+- **Saturation** (0-100%): Control color intensity (0% = gray, 100% = pure color)
+- **Value/Brightness** (0-100%): Control brightness (0% = black, 100% = full brightness)
 
 ## Color Format
 
@@ -248,6 +286,35 @@ Built with:
 ## License
 
 MIT License - feel free to use and modify!
+
+## Changelog
+
+### Version 2.0.0 (Latest)
+
+**New Features:**
+- ✨ **Compact mode**: Space-efficient layout perfect for multiple LEDs (default: true)
+- 🔽 **Collapsible picker**: Cards start collapsed by default to save space
+- 🎨 **Entity icon display**: Shows entity icon colored by hue at full brightness
+- ⌨️ **Direct hex input**: Type hex codes directly to duplicate colors
+- 🎛️ **Three-slider layout**: Separate sliders for hue, saturation, and value
+- 🎯 **Smart icon coloring**: Grayscale colors (black/gray/white) keep their actual color
+
+**Improvements:**
+- Entity friendly names are now automatically displayed
+- Sliders remain visible at all brightness levels
+- Better mobile app support with reliable collapsed state
+- Improved color conversion accuracy
+
+**Breaking Changes:**
+- Default layout changed to `compact: true` (was false)
+- Default state changed to `default_collapsed: true` (was false)
+- Removed `show_header` option (now uses compact row layout)
+
+### Version 1.0.0
+
+- Initial release
+- Basic HSV color picker with separate brightness control
+- Hex color output to input_text entities
 
 ## Support
 
