@@ -20,6 +20,7 @@ class ColorPickerCard extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this._colorPicker = null;
     this._isCollapsed = true; // Track collapsed state
+    this._isEditingHex = false; // Track when user is editing hex input
   }
 
   /**
@@ -157,6 +158,9 @@ class ColorPickerCard extends HTMLElement {
    */
   updateColorFromEntity(hexColor) {
     if (!this._colorPicker || !hexColor) return;
+
+    // Don't update if user is actively editing the hex input
+    if (this._isEditingHex) return;
 
     // Ensure hex color has # prefix
     if (!hexColor.startsWith('#')) {
@@ -541,8 +545,14 @@ class ColorPickerCard extends HTMLElement {
     }
 
     if (hexInput) {
+      hexInput.addEventListener('focus', () => {
+        this._isEditingHex = true;
+      });
+      hexInput.addEventListener('blur', (e) => {
+        this._isEditingHex = false;
+        this.handleHexInput(e);
+      });
       hexInput.addEventListener('change', (e) => this.handleHexInput(e));
-      hexInput.addEventListener('blur', (e) => this.handleHexInput(e));
     }
 
     // Apply initial collapsed state immediately
